@@ -126,6 +126,7 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
     name = "ACOPP14"
 
     if action == "setup"
+      ccall(:raise, Cint, (Cint,), 11)
         pb           = PB(name)
         pbm          = PBM(name)
         nargin       = length(args)
