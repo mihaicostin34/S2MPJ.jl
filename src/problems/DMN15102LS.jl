@@ -1,4 +1,5 @@
-function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function DMN15102LS(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+    iel::Number = 0, args::Vector{Vector{Number}}=[[]], nargsout::Number = 1, GVAR::Vector{Number} = [], igr::Number = 0)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -30,7 +31,6 @@ function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
     if action == "setup"
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -9521,7 +9521,8 @@ function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
         pb.pbclass = "C-SUR2-MN-66-0"
         pbm.objderlvl = 2
         pb.objderlvl = pbm.objderlvl;
-        return pb, pbm
+        pb_ref[] = pb
+        pbm_ref[] = pbm
 
 # **********************
 #  SET UP THE FUNCTION *
@@ -9532,16 +9533,14 @@ function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
 
     elseif action == "e_globs"
 
-        pbm = args[1]
-        arrset(pbm.efpar,1,0.25e0/atan(1.0e0))
-        return pbm
+        arrset(pbm[].efpar,1,0.25e0/atan(1.0e0))
 
     elseif action == "eLORENTZ"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_ = EV
+        iel_ = iel
+        nargout = nargsout
+        
         DENOM = (pbm.elpar[iel_][2]-pbm.elpar[iel_][1])^2+EV_[2]^2
         RATIO = EV_[2]/DENOM
         WOPI = pbm.efpar[1]*EV_[1]
@@ -9570,10 +9569,10 @@ function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
 
     elseif action == "gL2"
 
-        GVAR_   = args[1]
-        igr_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        GVAR_   = GVAR
+        igr_    = igr
+        nargout = nargsout
+        
         f_= GVAR_*GVAR_
         if nargout>1
             g_ = GVAR_+GVAR_
@@ -9596,9 +9595,8 @@ function DMN15102LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
 
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [1,0]
+        if pbm_ref[].name == name
+            pbm_ref[].has_globs = [1,0]
             return s2mpj_eval(action,args...)
         else
             println("ERROR: please run "*name*" with action = setup")

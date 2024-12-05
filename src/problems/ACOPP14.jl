@@ -1,4 +1,5 @@
-function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function ACOPP14(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+       iel::Number = 0, args::Vector{Vector{Number}}=[[]], nargsout::Number = 1)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -126,10 +127,8 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
     name = "ACOPP14"
 
     if action == "setup"
-      ccall(:raise, Cint, (Cint,), 11)
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -7601,17 +7600,17 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
         pb.objderlvl = pbm.objderlvl;
         pbm.conderlvl = [2]
         pb.conderlvl  = pbm.conderlvl;
-        return pb, pbm
+        pb_ref[] = pb
+        pbm_ref[] = pbm
 
 
     #%%%%%%%%%%%%%%% NONLINEAR ELEMENTS %%%%%%%%%%%%%%%
 
     elseif action == "eP2"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         f_   = EV_[1]^2
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7632,10 +7631,10 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eP4"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel_
+        nargout = nargsout
+
         f_   = EV_[1]^4
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7656,10 +7655,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eP11"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel_
+        nargout = nargsout
         f_   = EV_[1]*EV_[2]
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7682,10 +7680,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eP31"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         f_   = EV_[2]*(EV_[1]^3)
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7709,10 +7706,10 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eP22"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
+        
         f_   = (EV_[1]*EV_[2])^2
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7737,10 +7734,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eP211"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         f_   = (EV_[3]*EV_[2])*(EV_[1]^2)
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -7770,10 +7766,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eSIN11"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         U_ = zeros(Float64,3,4)
         IV_ =  zeros(Float64,3)
         U_[1,1] = U_[1,1]+1
@@ -7815,10 +7810,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eCOS11"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         U_ = zeros(Float64,3,4)
         IV_ =  zeros(Float64,3)
         U_[1,1] = U_[1,1]+1
@@ -7860,10 +7854,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eSIN211"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         U_ = zeros(Float64,4,5)
         IV_ =  zeros(Float64,4)
         U_[1,1] = U_[1,1]+1
@@ -7916,10 +7909,10 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eCOS211"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
+
         U_ = zeros(Float64,4,5)
         IV_ =  zeros(Float64,4)
         U_[1,1] = U_[1,1]+1
@@ -7972,10 +7965,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eSIN31"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         U_ = zeros(Float64,3,4)
         IV_ =  zeros(Float64,3)
         U_[1,1] = U_[1,1]+1
@@ -8018,10 +8010,9 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
 
     elseif action == "eCOS31"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         U_ = zeros(Float64,3,4)
         IV_ =  zeros(Float64,3)
         U_[1,1] = U_[1,1]+1
@@ -8067,10 +8058,8 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
     elseif action in  ["fx","fgx","fgHx","cx","cJx","cJHx","cIx","cIJx","cIJHx","cIJxv","fHxv",
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
-
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [0,0]
+        if pbm_ref[].name == name
+            pbm_ref[].has_globs = [0,0]
             return s2mpj_eval(action,args...)
         else
             println("ERROR: please run "*name*" with action = setup")

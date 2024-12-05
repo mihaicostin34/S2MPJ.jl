@@ -1,4 +1,5 @@
-function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function DMN15103LS(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+    iel::Number = 0, args::Vector{Vector{number}}=[[]], nargsout::Number = 1, GVAR::Vector{Number} = [], igr::Number = 0)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -30,7 +31,6 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
     if action == "setup"
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -9525,7 +9525,8 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
         pb.pbclass = "C-SUR2-MN-99-0"
         pbm.objderlvl = 2
         pb.objderlvl = pbm.objderlvl;
-        return pb, pbm
+        pb_ref[] = pb
+        pbm_ref[] = pbm
 
 # **********************
 #  SET UP THE FUNCTION *
@@ -9535,23 +9536,19 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
     #%%%%%%%%%%%%%%% NONLINEAR ELEMENTS %%%%%%%%%%%%%%%
 
     elseif action == "e_globs"
-
-        pbm = args[1]
-        arrset(pbm.efpar,1,0.25e0/atan(1.0e0))
-        return pbm
+        arrset(pbm_ref[].efpar,1,0.25e0/atan(1.0e0))
 
     elseif action == "eLORENTZ3"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
         PMX = EV_[3]-pbm.elpar[iel_][1]
         DENOM = PMX^2+EV_[2]^2
         DENOM2 = DENOM*DENOM
         DENOM3 = DENOM2*DENOM
         RATIO = EV_[2]/DENOM
-        WOPI = pbm.efpar[1]*EV_[1]
+        WOPI = pbm[].efpar[1]*EV_[1]
         TWOPI = WOPI+WOPI
         TWOPIW = TWOPI*EV_[2]
         ETP = 4.0e0*TWOPIW*PMX
@@ -9559,12 +9556,12 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
             g_  = zeros(Float64,dim)
-            g_[1] = pbm.efpar[1]*RATIO
+            g_[1] = pbm_ref[].efpar[1]*RATIO
             g_[2] = WOPI/DENOM-TWOPI*RATIO^2
             g_[3] = -TWOPIW*PMX/DENOM2
             if nargout>2
                 H_ = zeros(Float64,3,3)
-                H_[1,2] = pbm.efpar[1]/DENOM-2.0e0*pbm.efpar[1]*RATIO^2
+                H_[1,2] = pbm_ref[].efpar[1]/DENOM-2.0e0*pbm.efpar[1]*RATIO^2
                 H_[2,1] = H_[1,2]
                 H_[2,2] = -3.0e0*TWOPIW/DENOM2+8.0e0*WOPI*RATIO^3
                 H_[1,3] = -2.0e0*pbm.efpar[1]*EV_[2]*PMX/DENOM2
@@ -9586,10 +9583,9 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
 
     elseif action == "gL2"
 
-        GVAR_   = args[1]
-        igr_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        GVAR_   = GVAR
+        igr_    = igr
+        nargout = nargsout
         f_= GVAR_*GVAR_
         if nargout>1
             g_ = GVAR_+GVAR_
@@ -9612,10 +9608,9 @@ function DMN15103LS(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vecto
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
 
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [1,0]
-            return s2mpj_eval(action,args...)
+        if pbm_ref[].name == name
+            pbm_ref[].has_globs = [1,0]
+            return s2mpj_eval(action,pbm_ref[], args)
         else
             println("ERROR: please run "*name*" with action = setup")
             return ntuple(i->undef,args[end])

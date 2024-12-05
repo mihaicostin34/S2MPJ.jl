@@ -1,4 +1,5 @@
-function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function DUAL1(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+    iel::Number = 0, args::Vector{Vector{Number}}=[[]], nargsout::Number = 1)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -24,7 +25,6 @@ function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Flo
     if action == "setup"
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -14867,7 +14867,8 @@ function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Flo
         pb.objderlvl = pbm.objderlvl;
         pbm.conderlvl = [2]
         pb.conderlvl  = pbm.conderlvl;
-        return pb, pbm
+        pb_ref[] = pb
+        pbm_ref[] = pbm
 
 # **********************
 #  SET UP THE FUNCTION *
@@ -14878,10 +14879,10 @@ function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Flo
 
     elseif action == "eDIAG"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_ = EV
+        iel_ = iel
+        nargout = nargsout
+        
         f_   = 0.5*EV_[1]*EV_[1]
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -14902,10 +14903,10 @@ function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Flo
 
     elseif action == "eOFFDIAG"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
+        EV_ = EV
+        iel_ = iel
+        nargout = nargsout
+        
         f_   = EV_[1]*EV_[2]
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
@@ -14932,9 +14933,8 @@ function DUAL1(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Flo
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
 
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [0,0]
+        if pbm[].name == name
+            pbm[].has_globs = [0,0]
             return s2mpj_eval(action,args...)
         else
             println("ERROR: please run "*name*" with action = setup")

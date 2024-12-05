@@ -1,4 +1,5 @@
-function TRO3X3(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function TRO3X3(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+    iel::Number = 0, args::Vector{Vector{Number}}=[[]], nargsout::Number = 1)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -32,7 +33,6 @@ function TRO3X3(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Fl
     if action == "setup"
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -2471,7 +2471,8 @@ function TRO3X3(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Fl
         pb.objderlvl = pbm.objderlvl;
         pbm.conderlvl = [2]
         pb.conderlvl  = pbm.conderlvl;
-        return pb, pbm
+        pb_ref[] = pb
+        pbm_ref[] = pbm
 
 # **********************
 #  SET UP THE FUNCTION *
@@ -2482,19 +2483,18 @@ function TRO3X3(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Fl
 
     elseif action == "ePROD"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
-        f_   = pbm.elpar[iel_][1]*EV_[1]*EV_[2]
+        EV_     = EV
+        iel_    = iel
+        nargout = nargsout
+        f_   = pbm_ref[].elpar[iel_][1]*EV_[1]*EV_[2]
         if nargout>1
             dim = try length(IV_) catch; length(EV_) end
             g_  = zeros(Float64,dim)
-            g_[1] = pbm.elpar[iel_][1]*EV_[2]
-            g_[2] = pbm.elpar[iel_][1]*EV_[1]
+            g_[1] = pbm_ref[].elpar[iel_][1]*EV_[2]
+            g_[2] = pbm_ref[].elpar[iel_][1]*EV_[1]
             if nargout>2
                 H_ = zeros(Float64,2,2)
-                H_[1,2] = pbm.elpar[iel_][1]
+                H_[1,2] = pbm_ref[].elpar[iel_][1]
                 H_[2,1] = H_[1,2]
             end
         end
@@ -2512,9 +2512,8 @@ function TRO3X3(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Fl
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
 
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [0,0]
+        if pbm_ref[].name == name
+            pbm_ref[].has_globs = [0,0]
             return s2mpj_eval(action,args...)
         else
             println("ERROR: please run "*name*" with action = setup")

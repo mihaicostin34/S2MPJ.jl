@@ -1,4 +1,5 @@
-function DMN15103(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{Float64}}...)
+function DMN15103(action::String,pb_ref::Ref{PB}, pbm_ref::Ref{PBM}, EV::Vector{Number} = [],
+    iel::Number = 0, args::Vector{Vector{Number}}=[[]], nargsout::Number = 1)
 # 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # 
@@ -29,7 +30,6 @@ function DMN15103(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{
     if action == "setup"
         pb           = PB(name)
         pbm          = PBM(name)
-        nargin       = length(args)
         pbm.call     = getfield( Main, Symbol( name ) )
 
         #%%%%%%%%%%%%%%%%%%%  PREAMBLE %%%%%%%%%%%%%%%%%%%%
@@ -9944,22 +9944,19 @@ function DMN15103(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{
 
     elseif action == "e_globs"
 
-        pbm = args[1]
-        arrset(pbm.efpar,1,0.25e0/atan(1.0e0))
-        return pbm
+        arrset(pbm_ref[].efpar,1,0.25e0/atan(1.0e0))
 
     elseif action == "eLORENTZ3"
 
-        EV_     = args[1]
-        iel_    = args[2]
-        nargout = args[3]
-        pbm     = args[4]
-        PMX = EV_[3]-pbm.elpar[iel_][1]
+        EV_ = EV
+        iel_ = iel
+        nargout = nargsout
+        PMX = EV_[3]-pbm_ref[].elpar[iel_][1]
         DENOM = PMX^2+EV_[2]^2
         DENOM2 = DENOM*DENOM
         DENOM3 = DENOM2*DENOM
         RATIO = EV_[2]/DENOM
-        WOPI = pbm.efpar[1]*EV_[1]
+        WOPI = pbm_ref[].efpar[1]*EV_[1]
         TWOPI = WOPI+WOPI
         TWOPIW = TWOPI*EV_[2]
         ETP = 4.0e0*TWOPIW*PMX
@@ -9996,9 +9993,8 @@ function DMN15103(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{
                        "cJxv","cJtxv","cIJtxv","Lxy","Lgxy","LgHxy","LIxy","LIgxy","LIgHxy",
                        "LHxyv","LIHxyv"]
 
-        pbm = args[1]
-        if pbm.name == name
-            pbm.has_globs = [1,0]
+        if pbm_ref[].name == name
+            pbm_ref[].has_globs = [1,0]
             return s2mpj_eval(action,args...)
         else
             println("ERROR: please run "*name*" with action = setup")
