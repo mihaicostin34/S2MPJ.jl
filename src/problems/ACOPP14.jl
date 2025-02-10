@@ -160,15 +160,15 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
         ig,ig_,_ = s2mpj_ii("OBJ",ig_)
         arrset(gtype,ig,"<>")
         iv = ix_["P1"]
-        pbm.A[ig,iv] += Float64(2000.0)
+      #   pbm.A[ig,iv] += Float64(2000.0)
         iv = ix_["P2"]
-        pbm.A[ig,iv] += Float64(2000.0)
+      #   pbm.A[ig,iv] += Float64(2000.0)
         iv = ix_["P3"]
-        pbm.A[ig,iv] += Float64(4000.0)
+      #   pbm.A[ig,iv] += Float64(4000.0)
         iv = ix_["P4"]
-        pbm.A[ig,iv] += Float64(4000.0)
+      #   pbm.A[ig,iv] += Float64(4000.0)
         iv = ix_["P5"]
-        pbm.A[ig,iv] += Float64(4000.0)
+      #   pbm.A[ig,iv] += Float64(4000.0)
         for I = Int64(v_["1"]):Int64(v_["NODES"])
             ig,ig_,_ = s2mpj_ii("RP"*string(I),ig_)
             arrset(gtype,ig,"==")
@@ -183,52 +183,52 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"RP1")
         iv = ix_["P1"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("IP1",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"IP1")
         iv = ix_["Q1"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("RP2",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"RP2")
         iv = ix_["P2"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("IP2",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"IP2")
         iv = ix_["Q2"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("RP3",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"RP3")
         iv = ix_["P3"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("IP3",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"IP3")
         iv = ix_["Q3"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("RP6",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"RP6")
         iv = ix_["P4"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("IP6",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"IP6")
         iv = ix_["Q4"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("RP8",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"RP8")
         iv = ix_["P5"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         ig,ig_,_ = s2mpj_ii("IP8",ig_)
         arrset(gtype,ig,"==")
         arrset(pb.cnames,ig,"IP8")
         iv = ix_["Q5"]
-        pbm.A[ig,iv] += Float64(-1.0)
+      #   pbm.A[ig,iv] += Float64(-1.0)
         for I = Int64(v_["1"]):Int64(v_["LINES"])
             ig,ig_,_ = s2mpj_ii("FN"*string(I),ig_)
             arrset(gtype,ig,"<=")
@@ -406,24 +406,24 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
         #%%%%%%%%%%%%%%%%%%%% QUADRATIC %%%%%%%%%%%%%%%%%%%
         ix1 = ix_["P1"]
         ix2 = ix_["P1"]
-        pbm.H[ix1,ix2] = Float64(860.586)+pbm.H[ix1,ix2]
-        pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
+      #   pbm.H[ix1,ix2] = Float64(860.586)+pbm.H[ix1,ix2]
+      # #   pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
         ix1 = ix_["P2"]
         ix2 = ix_["P2"]
-        pbm.H[ix1,ix2] = Float64(5000.0)+pbm.H[ix1,ix2]
-        pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
+      # #   pbm.H[ix1,ix2] = Float64(5000.0)+pbm.H[ix1,ix2]
+      # #   pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
         ix1 = ix_["P3"]
         ix2 = ix_["P3"]
-        pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
-        pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
+      # #   pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
+      # #   pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
         ix1 = ix_["P4"]
         ix2 = ix_["P4"]
-        pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
-        pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
+      # #   pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
+      # #   pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
         ix1 = ix_["P5"]
         ix2 = ix_["P5"]
-        pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
-        pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
+      # #   pbm.H[ix1,ix2] = Float64(200.0)+pbm.H[ix1,ix2]
+      # #   pbm.H[ix2,ix1] = pbm.H[ix1,ix2]
         #%%%%%%%%%%%%%%%%%%%% ELFTYPE %%%%%%%%%%%%%%%%%%%%%
         iet_  = Dict{String,Int}()
         elftv = Vector{Vector{String}}()
@@ -7589,10 +7589,10 @@ function ACOPP14(action::String,args::Union{PBM,Int,Float64,Vector{Int},Vector{F
         pb.cupper[1:pb.nle] = zeros(Float64,pb.nle)
         pb.clower[pb.nle+1:pb.nle+pb.neq] = zeros(Float64,pb.neq)
         pb.cupper[pb.nle+1:pb.nle+pb.neq] = zeros(Float64,pb.neq)
-        Asave = pbm.A[1:ngrp, 1:pb.n]
-        pbm.A = Asave
-        Hsave = pbm.H[ 1:pb.n, 1:pb.n ]
-        pbm.H = Hsave
+      #   Asave = pbm.A[1:ngrp, 1:pb.n]
+      #   pbm.A = Asave
+      #   Hsave = pbm.H[ 1:pb.n, 1:pb.n ]
+      #   pbm.H = Hsave
         #%%%%% RETURN VALUES FROM THE SETUP ACTION %%%%%%%%
         pb.lincons = findall(x-> x in setdiff( pbm.congrps,nlc),pbm.congrps)
         pb.pbclass = "C-QOR2-AY-38-68"

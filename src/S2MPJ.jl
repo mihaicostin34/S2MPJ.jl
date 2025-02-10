@@ -13,7 +13,7 @@ include("s2mpjlib.jl")
 
 export PBM
 
-include("problem/ACOPP14.jl")
+include("problems/ACOPP14.jl")
 
 export ACOPP14
 

@@ -74,9 +74,9 @@ mutable struct PBM
     name::String
     objgrps::Vector{Int64}
     congrps::Vector{Int64}
-    A::SparseMatrixCSC{Float64, Int64}
+    # A::SparseMatrixCSC{Float64, Int64}
     gconst::Vector{Float64}
-    H::SparseMatrixCSC{Float64, Int64}
+    # H::SparseMatrixCSC{Float64, Int64}
     enames::Vector{String}
     elftype::Vector{String}
     elvar::Vector{Vector{Int64}}
@@ -97,9 +97,9 @@ mutable struct PBM
     PBM(name::String) = new( name,                             #name
                              Int64[],                          #objgrps
                              Int64[],                          #congrps
-                             spzeros(Float64, 100000, 100000), #A
+                            #  spzeros(Float64, 100000, 100000), #A
                              Float64[],                        #gconst
-                             spzeros(Float64, 100000, 100000), #H
+                            #  spzeros(Float64, 100000, 100000), #H
                              String[],                         #enames
                              String[],                         #elftype
                              Vector{Vector{Int64}}(),          #elvar
@@ -359,27 +359,28 @@ function evalgrsum( isobj::Bool, glist::Vector{Int}, x::Vector{Float64}, pbm::PB
 
    # Check if pbm.A is not empty
    
-   if !isempty(pbm.A)
-       sA1, sA2 = size(pbm.A)
-       has_A = true
-   else
-       has_A = false
-   end
+#    if !isempty(pbm.A)
+#        sA1, sA2 = size(pbm.A)
+       
+#    else
+#        has_A = false
+#    end
+   has_A = true
    
    # Evaluate the quadratic term, if any.
    
-   if isobj && !isempty(pbm.H)
-       Htimesx = pbm.H * x
+   if isobj #&& !isempty(pbm.H)
+    #    Htimesx = pbm.H * x
        if nargout == 1
            fx += 0.5 * x'* Htimesx
        elseif nargout == 2
            gx += Htimesx
            fx += 0.5 * x'* Htimesx
        elseif nargout == 3
-           Htimesx = pbm.H * x # This line appears redundant and could be omitted.
+        #    Htimesx = pbm.H * x # This line appears redundant and could be omitted.
            gx += Htimesx
            fx += 0.5 * x'* Htimesx
-           Hx += pbm.H
+        #    Hx += pbm.H
        end
    end
 
@@ -432,12 +433,12 @@ function evalgrsum( isobj::Bool, glist::Vector{Int}, x::Vector{Float64}, pbm::PB
        end
        if nargout == 1
            if has_A && ig <= sA1
-               fin += pbm.A[ig, 1:sA2]' * x[1:sA2]
+            #    fin += pbm.A[ig, 1:sA2]' * x[1:sA2]
            end
        elseif nargout in [2, 3]
            gin = zeros( Float64, n )
            if has_A && ig <= sA1
-               gin[1:sA2] = pbm.A[ig, 1:sA2]
+            #    gin[1:sA2] = pbm.A[ig, 1:sA2]
                fin += gin[1:sA2]' * x[1:sA2]
            end
        end
@@ -724,17 +725,18 @@ function evalHJv( mode::String, glist::Vector{Int}, x::Vector{Float64},
 
    # Check if pbm.A is not empty
    
-    if !isempty(pbm.A)
-        sA1, sA2 = size(pbm.A)
-        has_A = true
-    else
-        has_A = false
-    end
+    # if !isempty(pbm.A)
+    #     sA1, sA2 = size(pbm.A)
+        
+    # else
+    #     has_A = false
+    # end
+    has_A = true
    
     # Evaluate the quadratic term, if any.
 
-    if mode == "Hv" && !isempty(pbm.H)
-        HJv += pbm.H * v
+    if mode == "Hv" #&& !isempty(pbm.H)
+        # HJv += pbm.H * v
     end
 
     for iig in 1:length(glist)
@@ -780,8 +782,8 @@ function evalHJv( mode::String, glist::Vector{Int}, x::Vector{Float64},
         end
         gin = zeros( Float64, n )
         if has_A && ig <= sA1
-            fin += pbm.A[ig, 1:sA2]' * x[1:sA2]
-            gin[1:sA2] = pbm.A[ig, 1:sA2]
+            # fin += pbm.A[ig, 1:sA2]' * x[1:sA2]
+            # gin[1:sA2] = pbm.A[ig, 1:sA2]
         end
  
         Hin = spzeros( n, n)
@@ -917,7 +919,7 @@ function evalLx( gobjlist::Vector{Int}, gconlist::Vector{Int},
     # Handling the case of function evaluation
     
     if nargout == 1
-        if length( gobjlist ) > 0 || isdefined( pbm, :H )
+        if length( gobjlist ) > 0 #|| isdefined( pbm, :H )
             Lxy = evalgrsum( true, gobjlist, x, pbm, 1 )
         else
             Lxy = 0.0
@@ -932,7 +934,7 @@ function evalLx( gobjlist::Vector{Int}, gconlist::Vector{Int},
     
     elseif nargout == 2
 
-        if length( gobjlist ) > 0 || isdefined( pbm, :H)
+        if length( gobjlist ) > 0 #|| isdefined( pbm, :H)
             Lxy, Lgxy = evalgrsum( true, gobjlist, x, pbm, 2 )
         else
             Lxy  = 0.0
@@ -949,7 +951,7 @@ function evalLx( gobjlist::Vector{Int}, gconlist::Vector{Int},
     
     elseif nargout == 3
     
-        if length( gobjlist ) > 0 || isdefined( pbm, :H)
+        if length( gobjlist ) > 0 #|| isdefined( pbm, :H)
             Lxy, Lgxy, LgHxy = evalgrsum( true, gobjlist, x, pbm, 3 )
         else
             n     = length( x )
@@ -979,7 +981,7 @@ end
 function evalLHxyv( gobjlist::Vector{Int}, gconlist::Vector{Int},
                     x::Vector{Float64}, y::Vector{Float64}, v::Vector{Float64}, pbm::PBM )
 
-    if length(gobjlist) > 0 || isdefined( pbm, :H)
+    if length(gobjlist) > 0 #|| isdefined( pbm, :H)
         LHxyv = evalHJv( "Hv", gobjlist, x, v, Float64[], pbm )
     else
         n     = length( x )
